@@ -92,9 +92,9 @@ Debug
     grid-column-start: 2;
 }
 
-#debug-response{
+/* #debug-response{
     display: none;
-}
+} */
 
 /*
 Headers and footers

@@ -42,6 +42,7 @@ def process_filters(filters_input):
 def query():
     opensearch = get_opensearch() # Load up our OpenSearch client from the opensearch.py file.
     # Put in your code to query opensearch.  Set error as appropriate.
+    index_name = 'bbuy_products'
     error = None
     user_query = None
     query_obj = None
@@ -74,8 +75,10 @@ def query():
         query_obj = create_query("*", [], sort, sortDir)
 
     print("query obj: {}".format(query_obj))
-    response = None   # TODO: Replace me with an appropriate call to OpenSearch
-    # Postprocess results here if you so desire
+    response = opensearch.search(
+        body = query_obj,
+        index = index_name
+    )
 
     #print(response)
     if error is None:
@@ -88,13 +91,35 @@ def query():
 
 def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
-    query_obj = {
-        'size': 10,
-        "query": {
-            "match_all": {} # Replace me with a query that both searches and filters
+    # query_obj = {
+    #     'size': 10,
+    #     "query": {
+    #         "match_all": {} # Replace me with a query that both searches and filters
+    #     },
+    #     "aggs": {
+    #         #TODO: FILL ME IN
+    #     }
+    # }
+    query_obj  = {
+    "size": 10,
+    "query": {
+        "multi_match": {
+            "query": user_query,
+            "fields": ["name"]
+        }
+    },
+    "aggs": {
+        "regularPrice": {
+            "terms": {
+            "field": "regularPrice"
+            }
         },
-        "aggs": {
-            #TODO: FILL ME IN
+        "salePrice": {
+            "terms": {
+            "field": "salePrice"
+            }
         }
     }
+}
+
     return query_obj
