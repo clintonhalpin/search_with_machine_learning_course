@@ -1,12 +1,16 @@
 <div id="aggregations">
   {% if search_response.aggregations%}<div class="aggregations-result">
-    <div class="agg-header">Price</div>
+    <div class="px-2 font-bold">Price</div>
     {% if "filter.name=regularPrice" not in applied_filters %}
       {% for agg in search_response.aggregations.regularPrice.buckets %}
         {% if agg.doc_count > 0 %}
           <div class="aggregation">
-            <div><a
-                href="{{ url_for("search.query") }}?&query={{ query|e }}{{ applied_filters }}&filter.name=regularPrice&regularPrice.type=range&regularPrice.key={{ agg.key }}&regularPrice.from={{ agg.from }}&regularPrice.to={{ agg.to }}&regularPrice.displayName=Price">{{ agg.key }} (${{ agg.from }} TO ${{ agg.to }}): {{ agg.doc_count }}</a>
+            <div>
+              <a
+                class="flex hover:bg-slate-100 px-2 py-1"
+                href="{{ url_for("search.query") }}?&query={{ query|e }}{{ applied_filters }}&filter.name=regularPrice&regularPrice.type=range&regularPrice.key={{ agg.key }}&regularPrice.from={{ agg.from }}&regularPrice.to={{ agg.to }}&regularPrice.displayName=Price">
+                  {{ agg.key }} <span class="text-slate-500 ml-2">({{ agg.doc_count }})</span>
+              </a>
             </div>
           </div>{% endif %}
       {% endfor %}
@@ -15,9 +19,32 @@
       {% for agg in search_response.aggregations.regularPrice.buckets %}
         {% if agg.doc_count > 0 %}
           <div class="aggregation">
+            <div class="flex hover:bg-slate-100 bg-slate-100 px-2 py-1">{{ agg.key }}: {{ agg.doc_count }}</div>
+          </div>{% endif %}
+      {% endfor %}
+    {% endif %}
+
+
+    {% if "filter.name=department" not in applied_filters %}
+    <div class="agg-header mt-4">Department</div>
+    {% if "filter.name=department" not in applied_filters %}
+      {% for agg in search_response.aggregations.department.buckets %}
+        {% if agg.doc_count > 0 %}
+          <div class="aggregation">
+            <div><a
+                href="{{ url_for("search.query") }}?&query={{ query|e }}{{ applied_filters }}&filter.name=department&department.type=range&department.key={{ agg.key }}&department.from={{ agg.from }}&department.to={{ agg.to }}&department.displayName=Price">{{ agg.key }} - {{ agg.doc_count }}</a>
+            </div>
+          </div>{% endif %}
+      {% endfor %}
+    {% else %}
+      {# We've already applied it, just display it #}
+      {% for agg in search_response.aggregations.department.buckets %}
+        {% if agg.doc_count > 0 %}
+          <div class="aggregation">
             <div>{{ agg.key }}: {{ agg.doc_count }}</div>
           </div>{% endif %}
       {% endfor %}
+    {% endif %}
     {% endif %}
   </div>
   {#Add in Department aggregation display here #}

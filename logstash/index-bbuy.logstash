@@ -1,6 +1,6 @@
 input {
   file {
-    path => ["/workspace/datasets/product_data/products/*.xml"]  #Put in the path to the ungzipped/untarred product data.  To start smaller, simply select a smaller number of files or copy a few files to a different directory.
+    path => ["/workspace/datasets/product_data/products/products_0036_3476045_to_3543767.xml"]  #Put in the path to the ungzipped/untarred product data.  To start smaller, simply select a smaller number of files or copy a few files to a different directory.
     start_position => "beginning"
     codec => multiline {
             pattern => "<product>"
@@ -15,7 +15,7 @@ input {
         target => "xml_doc"
         store_xml => "false"
         xpath => [ # NOTE: this is not a complete list of fields.  If you wish to add more, put in the appropriate XPath expression.
-                  #TODO: is there a way to do this using XPath/XSL Functions so that we don't have to maintain a big list?
+            #TODO: is there a way to do this using XPath/XSL Functions so that we don't have to maintain a big list?
             "/product/productId/text()", "productId",
             "/product/sku/text()", "sku",
             "/product/name/text()", "name",

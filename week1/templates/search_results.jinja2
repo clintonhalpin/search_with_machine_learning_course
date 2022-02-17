@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block content %}
+  <div class="p-4">
   <div id="did-you-mean">DYM goes here</div>
   {% if display_filters%}
     <div id="applied-filters">{% include 'display_filters.jinja2' %}</div>
@@ -24,4 +25,5 @@
       <div id="search-results-container">If you are seeing this, you haven't returned a valid search response object yet. Be sure to implement opensearch.py and search.py appropriately.</div>
     </div>
   {% endif %}
+  </div>
 {% endblock %}
