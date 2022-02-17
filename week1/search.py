@@ -133,11 +133,26 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     query_obj = {
         "size": 500,
         "query": {
-            "multi_match": {
-                "query": user_query,
-                "fields": ["name^2", "description"],
-                "analyzer": "english",
-            }
+            "function_score": {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "multi_match": {
+                                    "query": user_query,
+                                    "fields": [
+                                        "name^100",
+                                        "shortDescription^50",
+                                        "longDescription^10",
+                                        "department.keyword",
+                                    ],
+                                }
+                            }
+                        ],
+                    }
+                },
+                "field_value_factor": {"field": "price", "missing": 1},
+            },
         },
         "aggs": {
             "regularPrice": {
@@ -151,5 +166,6 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
             },
         },
     }
+    # "filter": [{"range": {"regularPrice": {"gte": 0, "lte": 10}}}],
 
     return query_obj
