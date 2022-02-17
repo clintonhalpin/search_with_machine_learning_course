@@ -1,6 +1,9 @@
 FROM gitpod/workspace-full:legacy-dazzle-v1
 
 RUN sudo apt-get install -y graphviz
+## Added
+RUN sudo apt-get install tmux
+###
 RUN pyenv install 3.9.7
 # TODO: we are using 3.9.7 for the weekly projects, but here we are pip installing into the default for the Docker image.  We should probably create a pyenv.
 RUN pip install kaggle
