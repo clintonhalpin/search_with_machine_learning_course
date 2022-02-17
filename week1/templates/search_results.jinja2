@@ -1,22 +1,24 @@
 {% extends 'base.jinja2' %}
 
 {% block header %}
-  <h1>{% block title %}Search Results for {{query}} {% endblock %}</h1>
+  <h1>{% block title %}Search Results for <b>{{query}}</b> {% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
   <div class="p-4">
-  <div id="did-you-mean">DYM goes here</div>
+  {% if false %}<div id="did-you-mean">DYM goes here</div>{% endif %}
   {% if display_filters%}
     <div id="applied-filters">{% include 'display_filters.jinja2' %}</div>
   {% endif %}
   {% if search_response and search_response.hits%}
-    <div id="all-results">
-      <div id="search-meta-container">Your query of {{ query }} returned {{ "{:,d}".format(search_response.hits.total.value) }} hits in {{ search_response.took }} ms.</div>
-      {% if true%}
-        <div id="aggregations-container">{% include 'aggregations.jinja2' %}</div>
-      {% endif %}
-      <div id="search-results-container">{% include 'display_results.jinja2' %}</div>
+    <div>
+      <div id="search-meta-container">Your query of <b>{{ query }}</b> returned {{ "{:,d}".format(search_response.hits.total.value) }} hits in {{ search_response.took }} ms.</div>
+      <div class="grid grid-cols-12">
+        {% if true%}
+          <div class="col-span-3">{% include 'aggregations.jinja2' %}</div>
+        {% endif %}
+        <div class="col-span-9">{% include 'display_results.jinja2' %}</div>
+      </div>
       <div id="debug">{% include 'debug.jinja2' %}</div>
     </div>
   {% else %}

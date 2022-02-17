@@ -13,6 +13,7 @@ bp = Blueprint("search", __name__, url_prefix="/search")
 # display_filters -- return an array of filters that are applied that is appropriate for display
 # applied_filters -- return a String that is appropriate for inclusion in a URL as part of a query string.  This is basically the same as the input query string
 def process_filters(filters_input):
+    print(filters_input)
     # Filters look like: &filter.name=regularPrice&regularPrice.key={{ agg.key }}&regularPrice.from={{ agg.from }}&regularPrice.to={{ agg.to }}
     filters = []
     display_filters = (
@@ -130,11 +131,11 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
         rangesDeclaration.append(FilterRange)
 
     query_obj = {
-        "size": 20,
+        "size": 500,
         "query": {
             "multi_match": {
-                "query": "ipad 2",
-                "fields": ["name"],
+                "query": user_query,
+                "fields": ["name^2", "description"],
                 "analyzer": "english",
             }
         },
