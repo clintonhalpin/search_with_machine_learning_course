@@ -1,4 +1,4 @@
-# Welcome to Search with Machine Learning
+# Welcome to Search with ML
 
 Search with Machine Learning is a four week class taught by Grant Ingersoll and Daniel Tunkelang and is focused on helping students
 quickly get up to speed on search best practices by first teaching the basics of search and then extending those basics with machine learning.  
