@@ -13,7 +13,7 @@ bp = Blueprint("search", __name__, url_prefix="/search")
 # display_filters -- return an array of filters that are applied that is appropriate for display
 # applied_filters -- return a String that is appropriate for inclusion in a URL as part of a query string.  This is basically the same as the input query string
 def process_filters(filters_input):
-    print(filters_input)
+    print("PROCESS FILTERS", filters_input)
     # Filters look like: &filter.name=regularPrice&regularPrice.key={{ agg.key }}&regularPrice.from={{ agg.from }}&regularPrice.to={{ agg.to }}
     filters = []
     display_filters = (
@@ -31,8 +31,37 @@ def process_filters(filters_input):
         # TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
         # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
         if type == "range":
+            from_val = request.args.get(filter + ".from", None)
+            to_val = request.args.get(filter + ".to", None)
+            print("from: {}, to: {}".format(from_val, to_val))
+            # we need to turn the "to-from" syntax of aggregations to the "gte,lte" syntax of range filters.
+            to_from = {}
+            if from_val:
+                to_from["gte"] = from_val
+            else:
+                from_val = "*"  # set it to * for display purposes, but don't use it in the query
+            if to_val:
+                to_from["lt"] = to_val
+            else:
+                to_val = "*"  # set it to * for display purposes, but don't use it in the query
+            the_filter = {"range": {filter: to_from}}
+            filters.append(the_filter)
+            display_filters.append(
+                "{}: {} TO {}".format(display_name, from_val, to_val)
+            )
+            applied_filters += "&{}.from={}&{}.to={}".format(
+                filter, from_val, filter, to_val
+            )
             pass
         elif type == "terms":
+            field = request.args.get(filter + ".fieldName", filter)
+            key = request.args.get(filter + ".key", None)
+            the_filter = {"term": {field: key}}
+            filters.append(the_filter)
+            display_filters.append("{}: {}".format(display_name, key))
+            applied_filters += "&{}.fieldName={}&{}.key={}".format(
+                filter, field, filter, key
+            )
             pass  # TODO: IMPLEMENT
     print("Filters: {}".format(filters))
 
@@ -147,7 +176,7 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                                         "department.keyword",
                                     ],
                                 }
-                            }
+                            },
                         ],
                     }
                 },
@@ -166,6 +195,9 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
             },
         },
     }
+
+    if filters:
+        print("Apply filters")
     # "filter": [{"range": {"regularPrice": {"gte": 0, "lte": 10}}}],
 
     return query_obj

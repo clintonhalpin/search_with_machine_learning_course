@@ -83,3 +83,76 @@ POST bbuy_products/_search
     }
   }
 }
+
+
+## Experiment with index settings
+```
+DELETE /bespokeindex
+
+PUT /bespokeindex
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "smarter_hyphens": {
+          "tokenizer": "smarter_hyphens_tokenizer",
+          "filter": [
+            "smarter_hyphens_filter",
+            "lowercase"
+          ]
+        }
+      },
+      "tokenizer": {
+        "smarter_hyphens_tokenizer": {
+          "type": "char_group",
+          "tokenize_on_chars": [
+            "whitespace",
+            "\n"
+          ]
+        }
+      },
+      "filter": {
+        "smarter_hyphens_filter": {
+          "type": "word_delimiter_graph",
+          "catenate_words": true,
+          "catenate_all": true
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "name": {
+        "type": "text",
+        "analyzer": "english",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 2048
+          },
+          "hyphens": {
+            "type": "text",
+            "analyzer": "smarter_hyphens"
+          },
+          "suggest": {
+            "type": "completion"
+          }
+        }
+      }
+    }
+  }
+}
+
+PUT /bespokeindex/_doc/doc_a
+{
+  "name": "Targus - Versavu Case with Keyboard for Apple® iPad® 2 - White"
+}
+
+GET /bespokeindex/_search?q=ipad&format=yaml
+
+POST bespokeindex/_analyze
+{
+  "text": ["Targus - Versavu Case with Keyboard for Apple® iPad® 2 - White"],
+  "analyzer": "smarter_hyphens"
+}
+```
