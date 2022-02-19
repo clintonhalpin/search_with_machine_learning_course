@@ -97,7 +97,6 @@ def query():
 
     print("query")
     print(json.dumps(query_obj, indent=4))
-    # print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=index_name)
     if error is None:
         return render_template(
@@ -122,6 +121,39 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
         "sort": {sort: sortDir},
         "query": {
             "function_score": {
+                "functions": [
+                    {
+                        "field_value_factor": {
+                            "factor": 4,
+                            "field": "salesRankShortTerm",
+                            "missing": 10000000,
+                            "modifier": "reciprocal",
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 3,
+                            "field": "salesRankLongTerm",
+                            "missing": 10000000,
+                            "modifier": "reciprocal",
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 3,
+                            "field": "customerReviewAverage",
+                            "missing": 0,
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 6,
+                            "field": "customerReviewCount",
+                            "missing": 1,
+                            "modifier": "square",
+                        }
+                    },
+                ],
                 "query": {
                     "bool": {
                         "filter": filters,
@@ -136,7 +168,7 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                             }
                         },
                     },
-                }
+                },
             }
         },
         "aggs": {

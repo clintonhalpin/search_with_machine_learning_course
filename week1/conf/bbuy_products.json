@@ -125,22 +125,10 @@
         }
       },
       "customerReviewAverage": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
+        "type": "long"
       },
       "customerReviewCount": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
+        "type": "long"
       },
       "department": {
         "type": "text",
@@ -356,22 +344,10 @@
         }
       },
       "salesRankMediumTerm": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
+        "type": "long"
       },
       "salesRankShortTerm": {
-        "type": "text",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 256
-          }
-        }
+        "type": "long"
       },
       "shippingCost": {
         "type": "text",
