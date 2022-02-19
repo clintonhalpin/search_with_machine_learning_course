@@ -26,6 +26,11 @@
           {% endif %}
         {% endif %}
       </div>
+      <div><span class="search-result-header">Price</span>:
+        {% if hit._source.regularPrice %}
+          ${{ hit._source.regularPrice[0] }}
+        {% endif %}
+      </div>
     </div>
   {% endfor %}
 
