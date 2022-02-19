@@ -156,3 +156,21 @@ POST bespokeindex/_analyze
   "analyzer": "smarter_hyphens"
 }
 ```
+
+
+# Top Queries
+```
+GET /bbuy_queries/_search
+{
+  "size": 0,
+  "aggs": {
+    "query": {
+      "terms": {
+        "field": "query.keyword",
+        "size": 5,
+        "min_doc_count": 100
+      }
+    }
+  }
+}
+```

@@ -173,7 +173,6 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                                         "name^100",
                                         "shortDescription^50",
                                         "longDescription^10",
-                                        "department.keyword",
                                     ],
                                 }
                             },
