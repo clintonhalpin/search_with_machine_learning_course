@@ -30,7 +30,7 @@ def process_filters(filters_input):
         )
         # TODO: IMPLEMENT AND SET filters, display_filters and applied_filters.
         # filters get used in create_query below.  display_filters gets used by display_filters.jinja2 and applied_filters gets used by aggregations.jinja2 (and any other links that would execute a search.)
-        key = "foo"
+        key = request.args.get(filter + ".key")
         if type == "range":
             range_from = request.args.get(filter + ".from")
             range_to = request.args.get(filter + ".to")
@@ -42,10 +42,9 @@ def process_filters(filters_input):
                 range_filter["range"]["regularPrice"]["lt"] = range_to
             filters += [range_filter]
         elif type == "terms":
-            print("FILTERS")
-            key = request.args.get(filter + ".key", filter)
-            the_filter = {"term": {key: key}}
-            filters.append(the_filter)
+            name = request.args.get("filter.name")
+            the_filter = {"term": {name: key}}
+            filters += [the_filter]
             display_filters.append("{}: {}".format(display_name, key))
             applied_filters += "&{}.fieldName={}&{}.key={}".format(
                 filter, key, filter, key
@@ -96,7 +95,8 @@ def query():
         query_obj = create_query("*", [], sort, sortDir)
 
     print("query")
-    print(json.dumps(query_obj, indent=4))
+    # print(json.dumps(query_obj, indent=4))
+    print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=index_name)
     if error is None:
         return render_template(
