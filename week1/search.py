@@ -42,8 +42,14 @@ def process_filters(filters_input):
                 range_filter["range"]["regularPrice"]["lt"] = range_to
             filters += [range_filter]
         elif type == "terms":
-            applied_filters += "&{}.key={}".format(filter, key)
-            filters += [{"term": {"department.keyword": key}}]
+            print("FILTERS")
+            key = request.args.get(filter + ".key", filter)
+            the_filter = {"term": {key: key}}
+            filters.append(the_filter)
+            display_filters.append("{}: {}".format(display_name, key))
+            applied_filters += "&{}.fieldName={}&{}.key={}".format(
+                filter, key, filter, key
+            )
     print("Filters: {}".format(filters))
 
     return filters, display_filters, applied_filters
@@ -91,6 +97,7 @@ def query():
 
     print("query")
     print(json.dumps(query_obj, indent=4))
+    # print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=index_name)
     if error is None:
         return render_template(
@@ -123,7 +130,7 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                                 "query": user_query,
                                 "fields": [
                                     "name^100",
-                                    "shortDescription^50",
+                                    "shortDescription^20",
                                     "longDescription^10",
                                 ],
                             }
@@ -134,7 +141,7 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
         },
         "aggs": {
             "regularPrice": {
-                "range": {"field": "regularPrice", "ranges": price_range_agg}
+                "range": {"field": "regularPrice", "ranges": price_range_agg},
             },
             "department": department_agg,
         },
