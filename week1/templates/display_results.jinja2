@@ -5,7 +5,7 @@
       <div class="col-span-3">
         {% if hit._source.image %}
           <div class="p-2">
-            <img src="{{ hit._source.image[0] }}" alt="{{ hit._source.name[0] }}" class="w-full h-48 object-fit" />
+            <img src="{{ hit._source.image[0] }}" alt="{{ hit._source.name[0] }}" class="mx-auto h-48 object-fit" />
           </div>
         {% endif %}
       </div>
