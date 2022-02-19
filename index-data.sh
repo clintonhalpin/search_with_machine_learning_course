@@ -4,11 +4,19 @@ usage()
   exit 2
 }
 
+# Default Settings
 PRODUCTS_JSON_FILE="/workspace/search_with_machine_learning_course/opensearch/bbuy_products.json"
 QUERIES_JSON_FILE="/workspace/search_with_machine_learning_course/opensearch/bbuy_queries.json"
-
 PRODUCTS_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/logstash/index-bbuy.logstash"
 QUERIES_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/logstash/index-bbuy-queries.logstash"
+
+# Week 1 Settings
+
+PRODUCTS_JSON_FILE="/workspace/search_with_machine_learning_course/week1/conf/bbuy_products.json"
+PRODUCTS_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week1/conf/index-bbuy.logstash.conf"
+
+QUERIES_JSON_FILE="/workspace/search_with_machine_learning_course/week1/conf/bbuy_queries.json"
+QUERIES_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week1/conf/index-bbuy-queries.logstash.conf"
 
 LOGSTASH_HOME="/workspace/logstash/logstash-7.13.2"
 
@@ -29,7 +37,7 @@ do
 done
 shift $((OPTIND -1))
 
-
+echo ""
 echo "Creating index settings and mappings"
 echo " Product file: $PRODUCTS_JSON_FILE"
 echo " Query file: $QUERIES_JSON_FILE"
@@ -41,10 +49,12 @@ echo ""
 echo "Writing logs to $LOGS_DIR"
 mkdir -p $LOGS_DIR
 
+echo ""
 echo "Indexing"
 echo " Product Logstash file: $PRODUCTS_LOGSTASH_FILE"
 echo " Query Logstash file: $QUERIES_LOGSTASH_FILE"
 
+echo ""
 echo "Running Logstash found in $LOGSTASH_HOME"
 cd "$LOGSTASH_HOME"
 echo "Launching Logstash indexing in the background via nohup.  See product_indexing.log and queries_indexing.log for log output"
