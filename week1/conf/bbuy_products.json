@@ -33,6 +33,42 @@
       "@timestamp": {
         "type": "date"
       },
+      "name": {
+        "type": "text",
+        "analyzer": "english",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 2048
+          },
+          "hyphens": {
+            "type": "text",
+            "analyzer": "smarter_hyphens"
+          },
+          "suggest": {
+            "type": "completion"
+          }
+
+        }
+      },
+      "description": {
+        "type": "text",
+        "analyzer": "english"
+      },
+      "shortDescription": {
+        "type": "text",
+        "analyzer": "english"
+      },
+      "shortDescriptionHtml": {
+        "type": "keyword"
+      },
+      "longDescription": {
+        "type": "text",
+        "analyzer": "english"
+      },
+      "longDescriptionHtml": {
+        "type": "keyword"
+      },
       "@version": {
         "type": "text",
         "fields": {
@@ -148,10 +184,6 @@
           }
         }
       },
-      "description": {
-        "type": "text",
-        "analyzer": "english"
-      },
       "digital": {
         "type": "boolean"
       },
@@ -206,13 +238,6 @@
       "inStorePickup": {
         "type": "boolean"
       },
-      "longDescription": {
-        "type": "text",
-        "analyzer": "english"
-      },
-      "longDescriptionHtml": {
-        "type": "keyword"
-      },
       "manufacturer": {
         "type": "text",
         "fields": {
@@ -232,24 +257,6 @@
             "type": "keyword",
             "ignore_above": 256
           }
-        }
-      },
-      "name": {
-        "type": "text",
-        "analyzer": "english",
-        "fields": {
-          "keyword": {
-            "type": "keyword",
-            "ignore_above": 2048
-          },
-          "hyphens": {
-            "type": "text",
-            "analyzer": "smarter_hyphens"
-          },
-          "suggest": {
-            "type": "completion"
-          }
-
         }
       },
       "onSale": {
@@ -326,13 +333,6 @@
       },
       "shippingWeight": {
         "type": "float"
-      },
-      "shortDescription": {
-        "type": "text",
-        "analyzer": "english"
-      },
-      "shortDescriptionHtml": {
-        "type": "keyword"
       },
       "sku": {
         "type": "text",

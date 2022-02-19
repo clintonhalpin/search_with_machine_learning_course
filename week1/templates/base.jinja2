@@ -6,7 +6,7 @@
 </head>
 <body>
 <nav class="p-4">
-  <h1><a href="{{ url_for("query") }}">Search with Machine Learning</a></h1>
+  <h1 class="font-bold"><a href="{{ url_for("query") }}">Search with Machine Learning</a></h1>
   <ul>
   </ul>
 </nav>
@@ -20,7 +20,7 @@
   {% endfor %}
   {% block content %}{% endblock %}</body>
 </section>
-<section class="footer">
+<section class="footer p-8 py-4">
   {% block footer %}
     <div id="main-footer" class="footer">
       <div>Copyright Daniel Tunkelang and Grant Ingersoll. 2022</div>

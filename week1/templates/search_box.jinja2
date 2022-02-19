@@ -1,7 +1,7 @@
-<div class="p-2"> 
+<div> 
   <form method="post" action="{{ url_for('search.query') }}" class="flex">
     <input name="query" id="query" type="search" value="{{ query|e }}" required class="flex-grow">
-    <input type="submit" value="Query" class="p-2 bg-slate-200 mx-4">
+    <input type="submit" value="Query" class="p-2 bg-blue-500 text-white mx-4">
     <select name="sort">
       <option value="_score" {% if sort == "_score" %}selected{% endif %} >Relevance</option>
       <option value="name.keyword" {% if sort == "name.keyword" %}selected{% endif %}>Name</option>
