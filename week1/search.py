@@ -69,6 +69,7 @@ def getRelatedQueries(user_query):
         "size": 0,
         "query": {
             "bool": {
+                # Note this dosen't work... Need to play with analyzers and add more fields
                 "must_not": [{"match": {"query.keyword": user_query}}],
                 "should": [{"multi_match": {"query": user_query, "fields": []}}],
             }
