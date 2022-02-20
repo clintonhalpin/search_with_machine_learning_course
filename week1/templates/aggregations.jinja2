@@ -1,7 +1,7 @@
 <div id="aggregations">
   {% if search_response.aggregations%}
   <div class="aggregations-result">
-    <div class="agg-header">Price</div>
+    <div class="agg-header uppercase text-slate-500 pb-2 text-sm">Price</div>
     {% if "filter.name=regularPrice" not in applied_filters %}
       {% for agg in search_response.aggregations.regularPrice.buckets  %}
         {% if agg.doc_count > 1 %}
@@ -25,7 +25,7 @@
     {% endif %}
   </div>
   <div class="aggregations-result">
-    <div class="agg-header">Department</div>
+    <div class="agg-header uppercase text-slate-500 pt-8 pb-2 text-sm">Department</div>
     {% if "filter.name=department" not in applied_filters %}
       {% for agg in search_response.aggregations.department.buckets | sort(attribute='doc_count', reverse = True)  %}
         {% if agg.doc_count > 1 %}

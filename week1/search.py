@@ -161,7 +161,7 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                             "multi_match": {
                                 "query": user_query,
                                 "fields": [
-                                    "name^100",
+                                    "name^500",
                                     "shortDescription^20",
                                     "longDescription^10",
                                 ],
@@ -170,6 +170,13 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
                     },
                 },
             }
+        },
+        "highlight": {
+            "number_of_fragments": 3,
+            "fragment_size": 150,
+            "fields": {
+                "longDescription": {"pre_tags": ["<b>"], "post_tags": ["</b>"]},
+            },
         },
         "aggs": {
             "regularPrice": {
