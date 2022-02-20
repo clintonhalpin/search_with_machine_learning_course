@@ -1,7 +1,7 @@
 #
 # The main search hooks for the Search Flask application.
 #
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, jsonify
 import json
 
 from week1.opensearch import get_opensearch
@@ -52,6 +52,36 @@ def process_filters(filters_input):
     print("Filters: {}".format(filters))
 
     return filters, display_filters, applied_filters
+
+
+@bp.route("/reformulations", methods=["GET"])
+def reformulations():
+    user_query = request.args.get("query", "*")
+    relatedQueries = getRelatedQueries(user_query)
+    response = {"originalQuery": user_query, "relatedQueries": relatedQueries}
+    return jsonify(response)
+
+
+def getRelatedQueries(user_query):
+    opensearch = get_opensearch()
+    index_name = "bbuy_queries"
+    query_obj = {
+        "size": 0,
+        "query": {
+            "bool": {
+                "must_not": [{"match": {"query.keyword": user_query}}],
+                "should": [{"multi_match": {"query": user_query, "fields": []}}],
+            }
+        },
+        "aggs": {
+            "query": {
+                "terms": {"field": "query.keyword", "size": 5, "min_doc_count": 100}
+            }
+        },
+    }
+
+    response = opensearch.search(body=query_obj, index=index_name)
+    return response["aggregations"]["query"]["buckets"]
 
 
 # Our main query route.  Accepts POST (via the Search box) and GETs via the clicks on aggregations/facets
@@ -116,67 +146,63 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
     price_range_agg = create_price_range_agg()
     department_agg = create_department_agg()
-    is_empty = user_query == '*'
+    is_empty = user_query == "*"
 
     if is_empty:
-        query = {
-            "simple_query_string": {
-                "query": user_query
-            }
-        }
+        query = {"simple_query_string": {"query": user_query}}
     else:
         query = {
-                "function_score": {
-                    "functions": [
-                        {
-                            "field_value_factor": {
-                                "factor": 4,
-                                "field": "salesRankShortTerm",
-                                "missing": 10000000,
-                                "modifier": "reciprocal",
+            "function_score": {
+                "functions": [
+                    {
+                        "field_value_factor": {
+                            "factor": 4,
+                            "field": "salesRankShortTerm",
+                            "missing": 10000000,
+                            "modifier": "reciprocal",
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 3,
+                            "field": "salesRankLongTerm",
+                            "missing": 10000000,
+                            "modifier": "reciprocal",
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 8,
+                            "field": "customerReviewAverage",
+                            "missing": 0,
+                        }
+                    },
+                    {
+                        "field_value_factor": {
+                            "factor": 1000,
+                            "field": "customerReviewCount",
+                            "missing": 1,
+                            "modifier": "square",
+                        }
+                    },
+                ],
+                "query": {
+                    "bool": {
+                        "filter": filters,
+                        "must": {
+                            "multi_match": {
+                                "query": user_query,
+                                "fields": [
+                                    "name^100",
+                                    "shortDescription^20",
+                                    "longDescription^10",
+                                ],
                             }
-                        },
-                        {
-                            "field_value_factor": {
-                                "factor": 3,
-                                "field": "salesRankLongTerm",
-                                "missing": 10000000,
-                                "modifier": "reciprocal",
-                            }
-                        },
-                        {
-                            "field_value_factor": {
-                                "factor": 8,
-                                "field": "customerReviewAverage",
-                                "missing": 0,
-                            }
-                        },
-                        {
-                            "field_value_factor": {
-                                "factor": 1000,
-                                "field": "customerReviewCount",
-                                "missing": 1,
-                                "modifier": "square",
-                            }
-                        },
-                    ],
-                    "query": {
-                        "bool": {
-                            "filter": filters,
-                            "must": {
-                                "multi_match": {
-                                    "query": user_query,
-                                    "fields": [
-                                        "name^100",
-                                        "shortDescription^20",
-                                        "longDescription^10",
-                                    ],
-                                }
-                            },
                         },
                     },
-                }
+                },
             }
+        }
 
     query_obj = {
         "size": 0 if is_empty else 10,
@@ -186,8 +212,14 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
             "number_of_fragments": 3,
             "fragment_size": 150,
             "fields": {
-                "longDescription": {"pre_tags": ["<span class='text-black'>"], "post_tags": ["</span>"]},
-                "name": {"pre_tags": ["<span class='text-black font-semibold'>"], "post_tags": ["</span>"]},
+                "longDescription": {
+                    "pre_tags": ["<span class='text-black'>"],
+                    "post_tags": ["</span>"],
+                },
+                "name": {
+                    "pre_tags": ["<span class='text-black font-semibold'>"],
+                    "post_tags": ["</span>"],
+                },
             },
         },
         "aggs": {
