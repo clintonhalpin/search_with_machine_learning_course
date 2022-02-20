@@ -12,7 +12,7 @@
       <div class="col-span-9 px-4 text-slate-500">
         <div class="sm:grid grid-cols-12">
         <div class="col-span-9">
-        <div class="search-result-name text-md text-slate-900">{#do we have a highlight?#}
+        <div class="search-result-name text-md text-zinc-600">{#do we have a highlight?#}
           {% if hit.highlight and hit.highlight.name %}
             {{ hit.highlight.name[0] }}
           {% else%}
@@ -37,11 +37,20 @@
               {% endif %}
             {% endif %}
           </div>
-          <div><span class="search-result-header">Department</span>:
+          <div class="text-sm mt-2">
           {% if hit._source.department[0] %}
-            {{ hit._source.department[0] }}
+          <div>
+            <span class="search-result-header">Department</span>:
+              {{ hit._source.department[0] }}
+          </div>
           {% endif %}
-        </div>
+          {% if hit._source.customerReviewCount %}
+            <div>
+              <span class="search-result-header">Customer Reviews</span>:
+                {{ hit._source.customerReviewCount[0] }}
+            </div>
+          {% endif %}
+          </div>
         </div>
         <div class="col-span-3 sm:px-8">
         <div>

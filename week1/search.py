@@ -95,8 +95,8 @@ def query():
         query_obj = create_query("*", [], sort, sortDir)
 
     print("query")
-    # print(json.dumps(query_obj, indent=4))
-    print("query obj: {}".format(query_obj))
+    print(json.dumps(query_obj, indent=4))
+    # print("query obj: {}".format(query_obj))
     response = opensearch.search(body=query_obj, index=index_name)
     if error is None:
         return render_template(
@@ -116,66 +116,78 @@ def create_query(user_query, filters, sort="_score", sortDir="desc"):
     print("Query: {} Filters: {} Sort: {}".format(user_query, filters, sort))
     price_range_agg = create_price_range_agg()
     department_agg = create_department_agg()
-    query_obj = {
-        "size": 10,
-        "sort": {sort: sortDir},
-        "query": {
-            "function_score": {
-                "functions": [
-                    {
-                        "field_value_factor": {
-                            "factor": 4,
-                            "field": "salesRankShortTerm",
-                            "missing": 10000000,
-                            "modifier": "reciprocal",
-                        }
-                    },
-                    {
-                        "field_value_factor": {
-                            "factor": 3,
-                            "field": "salesRankLongTerm",
-                            "missing": 10000000,
-                            "modifier": "reciprocal",
-                        }
-                    },
-                    {
-                        "field_value_factor": {
-                            "factor": 3,
-                            "field": "customerReviewAverage",
-                            "missing": 0,
-                        }
-                    },
-                    {
-                        "field_value_factor": {
-                            "factor": 6,
-                            "field": "customerReviewCount",
-                            "missing": 1,
-                            "modifier": "square",
-                        }
-                    },
-                ],
-                "query": {
-                    "bool": {
-                        "filter": filters,
-                        "must": {
-                            "multi_match": {
-                                "query": user_query,
-                                "fields": [
-                                    "name^500",
-                                    "shortDescription^20",
-                                    "longDescription^10",
-                                ],
+    is_empty = user_query == '*'
+
+    if is_empty:
+        query = {
+            "simple_query_string": {
+                "query": user_query
+            }
+        }
+    else:
+        query = {
+                "function_score": {
+                    "functions": [
+                        {
+                            "field_value_factor": {
+                                "factor": 4,
+                                "field": "salesRankShortTerm",
+                                "missing": 10000000,
+                                "modifier": "reciprocal",
                             }
                         },
+                        {
+                            "field_value_factor": {
+                                "factor": 3,
+                                "field": "salesRankLongTerm",
+                                "missing": 10000000,
+                                "modifier": "reciprocal",
+                            }
+                        },
+                        {
+                            "field_value_factor": {
+                                "factor": 8,
+                                "field": "customerReviewAverage",
+                                "missing": 0,
+                            }
+                        },
+                        {
+                            "field_value_factor": {
+                                "factor": 1000,
+                                "field": "customerReviewCount",
+                                "missing": 1,
+                                "modifier": "square",
+                            }
+                        },
+                    ],
+                    "query": {
+                        "bool": {
+                            "filter": filters,
+                            "must": {
+                                "multi_match": {
+                                    "query": user_query,
+                                    "fields": [
+                                        "name^100",
+                                        "shortDescription^20",
+                                        "longDescription^10",
+                                    ],
+                                }
+                            },
+                        },
                     },
-                },
+                }
             }
-        },
+
+    query_obj = {
+        "size": 0 if is_empty else 10,
+        "sort": {sort: sortDir},
+        "query": query,
         "highlight": {
             "number_of_fragments": 3,
             "fragment_size": 150,
             "fields": {
-                "longDescription": {"pre_tags": ["<b>"], "post_tags": ["</b>"]},
+                "longDescription": {"pre_tags": ["<span class='text-black'>"], "post_tags": ["</span>"]},
+                "name": {"pre_tags": ["<span class='text-black font-semibold'>"], "post_tags": ["</span>"]},
             },
         },
         "aggs": {
