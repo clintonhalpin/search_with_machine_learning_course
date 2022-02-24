@@ -17,6 +17,10 @@ RUN pip install numexpr
 #RUN pip install bottleneck
 RUN pip install flask
 
+
+# CUSTOM FOR FORMATTING
+RUN pip install black
+
 RUN pyenv virtualenv 3.9.7 search_with_ml_opensearch
 RUN pyenv virtualenv 3.9.7 search_with_ml_week1
 #RUN bash -c "export PATH="/home/gitpod/.pyenv/bin:$PATH" && eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)" && pyenv activate search_with_ml_week1 && pip install -r requirements_week1.txt"

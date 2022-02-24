@@ -2,8 +2,8 @@
 while [ true ];
 do
   echo "Queries:"
-  curl -k -XGET -u admin:admin  "https://localhost:9200/_cat/count/bbuy_queries";
+  curl -k -XGET -u admin:admin  "https://localhost:9200/_cat/count/bbuy_queries" | sed ':a;s/\B[0-9]\{3\}\>/,&/;ta';
   echo "Products:"
-  curl -k -XGET -u admin:admin  "https://localhost:9200/_cat/count/bbuy_products";
-  sleep 100;
+  curl -k -XGET -u admin:admin  "https://localhost:9200/_cat/count/bbuy_products" | sed ':a;s/\B[0-9]\{3\}\>/,&/;ta';
+  sleep 5;
 done
