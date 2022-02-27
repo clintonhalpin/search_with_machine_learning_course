@@ -215,43 +215,36 @@ class DataPrepper:
         print("The following queries produced no results: %s" % no_results)
         return features_df
 
-    # Features look like:
-    # {'log_entry': [{'name': 'title_match',
-    #          'value': 7.221403},
-    #         {'name': 'shortDescription_match'},
-    #         {'name': 'longDescription_match'},
-    #         {'name': 'onsale_function', 'value': 0.0},
-    #         {'name': 'short_term_rank_function', 'value': 1922.0},
-    #         {'name': 'medium_term_rank_function', 'value': 7831.0},
-    #         {'name': 'long_term_rank_function', 'value': 4431.0},
-    #         {'name': 'sale_price_function', 'value': 949.99},
-    #         {'name': 'price_function', 'value': 0.0}]}]
-    # For each query, make a request to OpenSearch with SLTR logging on and extract the features
+    # Run this command standalone
+    # python week2/utilities/build_ltr.py --ltr_terms_field sku --output_dir /workspace/ltr_output --create_xgb_training -f week2/conf/ltr_featureset.json --click_model heuristic
     def __log_ltr_query_features(self, query_id, key, query_doc_ids, click_prior_query, no_results, terms_field="_id"):
-
+    
         log_query = lu.create_feature_log_query(key, query_doc_ids, click_prior_query, self.featureset_name,
                                                 self.ltr_store_name,
                                                 size=len(query_doc_ids), terms_field=terms_field)
-        # IMPLEMENT_START --
-        print("IMPLEMENT ME: __log_ltr_query_features: Extract log features out of the LTR:EXT response and place in a data frame")
-        # Loop over the hits structure returned by running `log_query` and then extract out the features from the response per query_id and doc id.  Also capture and return all query/doc pairs that didn't return features
-        # Your structure should look like the data frame below
-        feature_results = {}
-        feature_results["doc_id"] = []  # capture the doc id so we can join later
-        feature_results["query_id"] = []  # ^^^
-        feature_results["sku"] = []
-        feature_results["salePrice"] = []
-        feature_results["name_match"] = []
-        rng = np.random.default_rng(12345)
-        for doc_id in query_doc_ids:
-            feature_results["doc_id"].append(doc_id)  # capture the doc id so we can join later
-            feature_results["query_id"].append(query_id)
-            feature_results["sku"].append(doc_id)  # ^^^
-            feature_results["salePrice"].append(rng.random())
-            feature_results["name_match"].append(rng.random())
-        frame = pd.DataFrame(feature_results)
-        return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})
-        # IMPLEMENT_END
+        response = self.opensearch.search(body=log_query, index=self.index_name)
+        if response and response['hits']['hits'] and len(response['hits']['hits']) > 0:
+            feature_results = {}  
+            feature_results["doc_id"] = []  
+            feature_results["query_id"] = []  
+            feature_results["sku"] = []
+            for hit in response['hits']['hits']:
+                feature_results["doc_id"].append(int(hit['_id']))
+                feature_results["sku"].append(int(hit['_source']['sku'][0]))
+                feature_results["query_id"].append(int(query_id))  
+                features = hit['fields']['_ltrlog'][0]['log_entry']
+                for feature in features:
+                    feature_name = feature.get('name')
+                    feature_value = feature.get('value', 0)
+                    feature_values = feature_results.get(feature_name)
+                    if feature_values is None:
+                        feature_values = []
+                        feature_results[feature_name] = feature_values
+                    feature_values.append(feature_value)
+            frame = pd.DataFrame(feature_results)
+            return frame.astype({'doc_id': 'int64', 'query_id': 'int64', 'sku': 'int64'})  
+        no_results[key] = query_doc_ids
+        return None
 
     # Can try out normalizing data, but for XGb, you really don't have to since it is just finding splits
     def normalize_data(self, ranks_features_df, feature_set, normalize_type_map):
