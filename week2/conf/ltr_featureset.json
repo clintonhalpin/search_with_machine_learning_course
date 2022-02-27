@@ -2,6 +2,26 @@
   "featureset": {
     "features": [
       {
+        "name": "average_term_position",
+        "params": [
+          "keywords"
+        ],
+        "template_language": "mustache",
+        "template": {
+          "match_explorer": {
+            "type": "avg_raw_tp",
+            "query": {
+              "match": {
+                "name.keywords": {
+                  "query": "{{keywords}}",
+                  "boost": 5
+                }
+              }
+            }
+          }
+        }
+      },
+      {
         "name": "name_match",
         "params": [
           "keywords"
