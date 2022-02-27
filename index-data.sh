@@ -11,12 +11,16 @@ PRODUCTS_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/logstash/
 QUERIES_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/logstash/index-bbuy-queries.logstash"
 
 # Week 1 Settings
-
 PRODUCTS_JSON_FILE="/workspace/search_with_machine_learning_course/week1/conf/bbuy_products.json"
 PRODUCTS_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week1/conf/index-bbuy.logstash.conf"
-
 QUERIES_JSON_FILE="/workspace/search_with_machine_learning_course/week1/conf/bbuy_queries.json"
 QUERIES_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week1/conf/index-bbuy-queries.logstash.conf"
+
+# Week 2 Settings
+PRODUCTS_JSON_FILE="/workspace/search_with_machine_learning_course/week2/conf/bbuy_products.json"
+PRODUCTS_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week2/conf/index-bbuy.logstash.conf"
+QUERIES_JSON_FILE="/workspace/search_with_machine_learning_course/week2/conf/bbuy_queries.json"
+QUERIES_LOGSTASH_FILE="/workspace/search_with_machine_learning_course/week2/conf/index-bbuy-queries.logstash.conf"
 
 LOGSTASH_HOME="/workspace/logstash/logstash-7.13.2"
 
