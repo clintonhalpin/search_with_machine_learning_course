@@ -71,3 +71,53 @@ Queries
 - How does the search engine’s performance compare to your expectations?
 - What kinds of mistakes did the search engine make? Do you know why?
 - How do your results compare to the top results from the aggregated query logs?
+
+
+## Self Assessment
+
+Do you understand the steps involved in creating and deploying an LTR model? Name them and describe what each step does in your own words.
+
+Steps for LTR
+1. Create the LTR store, LTR is a plugin for opensearch/elastic search
+2. Create LTR features / upload them.
+3. Create a test set. In our case we are taking roughly half of the clicks one to train with another to test with. From the training set we pull metrics from LTR / Elastic Search to store in our model as well as impressions
+4. Train model with XGBBoost and upload to LTR store in Elastic search
+5. With the trained model we can use a "rescore" to improve our baseline query
+
+- What is a feature and featureset?
+    - A feature comes from search information about a document
+    - A featureset is a group of features combined together to improve relevance with LTR
+
+- What is the difference between precision and recall?
+    - Recall: The measure of relevant documents out of the entire corpus
+    - Precision: The measure of relevant results in the retrieved results
+
+- What are some of the traps associated with using click data in your model?
+    - Clicks don't describe discrete value for the user. For instance we would be better off if we had purchases or some signal that had a bit more weight to it. Clicks could be accidental or influenced by position / display etc...
+
+- What are some of the ways we are faking our data and how would you prevent that in your application?
+    - We are using fake impressions in our training, we are training on a subset of data. In future applications we could incorporate the position/order of results to have more accurate models
+    - You could pay testers to rank results manually human judgements
+
+- What is target leakage and why is it a bad thing?
+    - When you train a model on information that will not be seen with new data. Leakage can cause a model to select suboptimal results and think it's performing better than it actually is.
+
+- When can using prior history cause problems in search and LTR?
+    - New products are likely to be penalized because the model hasn't ever seen them before. 
+
+Submit your project along with your best MRR scores
+
+```
+Simple MRR is 0.301
+LTR Simple MRR is 0.302
+Hand tuned MRR is 0.392
+LTR Hand Tuned MRR is 0.522
+
+Simple p@10 is 0.101
+LTR simple p@10 is 0.101
+Hand tuned p@10 is 0.172
+LTR hand tuned p@10 is 0.263
+Simple better: 67	LTR_Simple Better: 144	Equal: 2416
+HT better: 837	LTR_HT Better: 765	Equal: 1377
+Saving Better/Equal analysis to /workspace/ltr_output/analysis
+```

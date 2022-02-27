@@ -11,7 +11,7 @@
           "match": {
             "name": {
               "query": "{{keywords}}",
-              "boost": 8
+              "boost": 12
             }
           }
         }
