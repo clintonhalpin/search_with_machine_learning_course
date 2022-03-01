@@ -14,4 +14,4 @@ reindex_init () {
 
 }
 
-reindex_init
+reindex_init 

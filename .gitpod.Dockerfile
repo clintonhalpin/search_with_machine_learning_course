@@ -36,6 +36,7 @@ RUN pip install opensearch-py
 
 # CUSTOM FOR FORMATTING
 RUN pip install black
+RUN pip install jupyterlab
 
 RUN pyenv virtualenv 3.9.7 search_with_ml_opensearch
 RUN pyenv virtualenv 3.9.7 search_with_ml_week1

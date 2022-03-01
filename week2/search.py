@@ -119,7 +119,7 @@ def query():
             (filters, display_filters, applied_filters) = process_filters(filters_input)
         model = request.args.get("model", "simiple")
         if model == "simple_LTR":
-            query_obj = qu.create_simple_baseline(user_query, click_prior, filters, sort, sortDir, size=500)
+            query_obj = qu.create_simple_baseline(user_query, click_prior, filters, sort, sortDir, size=100)
             query_obj = lu.create_rescore_ltr_query(user_query, query_obj, click_prior, ltr_model_name, ltr_store_name, rescore_size=500)
         elif model == "ht_LTR":
             query_obj = qu.create_query(user_query, click_prior, filters, sort, sortDir, size=100)
@@ -132,6 +132,9 @@ def query():
         query_obj = qu.create_query("*", "", [], sort, sortDir, size=100)
 
     #print("query obj: {}".format(query_obj))
+
+    # Not sure I think chrome is crashing because of too many nodes
+    query_obj['size'] = 100;
     response = opensearch.search(body=query_obj, index="bbuy_products", explain=explain)
     # Postprocess results here if you so desire
 
