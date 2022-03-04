@@ -130,3 +130,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Pruned Products
+data/computer_products/computer_products.xml
+data/pruned_products/pruned_products_*.xml
