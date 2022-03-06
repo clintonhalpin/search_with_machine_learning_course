@@ -132,6 +132,7 @@ def query():
         query_obj = qu.create_query("*", "", [], sort, sortDir, size=100)
 
     #print("query obj: {}".format(query_obj))
+    print(model)
     response = opensearch.search(body=query_obj, index=current_app.config["index_name"], explain=explain)
     # Postprocess results here if you so desire
 

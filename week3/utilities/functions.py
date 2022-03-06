@@ -5,6 +5,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 nltk.download('words', quiet=True)
 nltk.download('stopwords', quiet=True)
+nltk.download('punkt', quiet=True)
 stemmer = SnowballStemmer('english')
 
 def extract_title_transform(name):

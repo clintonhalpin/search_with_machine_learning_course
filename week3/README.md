@@ -9,7 +9,6 @@ pip install -r ../requirements_week3.txt
 ## Product Name Stemmer & Tokenizer
 First attempt at nltk library. Goals to stem words and clean up strings of titles as much as possible!
 
-
 ```python
 import nltk
 from nltk.stem import SnowballStemmer
@@ -32,20 +31,19 @@ def transform_name(product_name):
 
 
 for name in names:
-    print(name, '=>', transform_name(name))
+    print(transform_name(name))
 ```
 
-    Peavey - GT10 10W Guitar Amplifier => peavey gt10 10w guitar amplifi
-    Roland - 20W Guitar Amplifier => roland 20w guitar amplifi
-    PhoneMate - 5.8GHz Expandable Cordless Phone => phonem expand cordless phone
-    Whirlpool - 17.5 Cu. Ft. Chest Freezer - White => whirlpool cu ft chest freezer white
+    peavey gt10 10w guitar amplifi
+    roland 20w guitar amplifi
+    phonem expand cordless phone
+    whirlpool cu ft chest freezer white
 
 
 ---
 ## Exercise 1 
-### Precision and Recall (Category Depth 4)
-categoryPath ex. `abcat0712003` = `Board & Puzzle`
-
+### Precision and Recall @ Category Level 4
+Category Example:  `abcat0712003` = `Board & Puzzle`
 
 ```bash
 %%bash
@@ -65,9 +63,8 @@ echo "p@5"
     R@5	0.771
 
 
-### Precision and Recall (Category Depth 3)
-categoryPath ex. `abcat0705002` = `PSP`
-
+### Precision and Recall @ Category Level 3
+Category Example: `abcat0705002` = `PSP`
 
 ```bash
 %%bash
@@ -86,13 +83,11 @@ echo "p@5"
     P@5	0.172
     R@5	0.86
 
-
 ---
 ## Exercise 2
 Derive Synonyms from Content
 
 Below Is my working function for cleaning up product names
-
 
 ```python
 import nltk
@@ -132,14 +127,15 @@ for name in names:
     print(transform_name(name))
 ```
 
+Output
+
     peavey guitar amplifier
     roland guitar amplifier
     phonemate expandable cordless phone
     whirlpool cu ft chest freezer white
     apple iphone pro max sierra blue bose headphones wireless noise cancelling overtheear headphones triple black
 
-
-# Synonyms from Title Model
+## Synonyms from Title Model
 I used the basic fasttext model builder, didn't experiment much with tuning. 
 
 Build the model
@@ -147,8 +143,7 @@ Build the model
 ~/fastText-0.9.2/fasttext skipgram -input /workspace/datasets/fasttext/titles.txt -output /workspace/datasets/fasttext/title_model
 ```
 
-Test the model
-
+Testing model. Built a small python script to test my fast text model see results below. I calculated the score by number of matches over threshold  out of 10 matches returned.
 
 ```bash
 %%bash
@@ -180,11 +175,37 @@ python testSynonyms.py
 
 
 ---
+## Exercise 3
+Integrate Synonyms with search
+
+```bash
+%%bash
+curl -XPOST -s http://localhost:5000/documents/annotate -H "Content-Type:application/json" -d '{"name":"laptop", "sku":"abc"}'
+```
+
+    {
+      "name_synonyms": [
+        "processor", 
+        "gateway", 
+        "drive", 
+        "ideapad", 
+        "aspir", 
+        "pavilion", 
+        "vaio", 
+        "ideacentr", 
+        "duo", 
+        "display"
+      ]
+    }
+
+
+---
+
 ## Project Assement
 ### For classifying product names to categories:
 
 What precision (P@1) were you able to achieve?
-- .56
+`.56`
 
 What fastText parameters did you use?
 - epoch=25, wordNGrams=2, learningRate=1.0
@@ -199,26 +220,31 @@ How did you prune infrequent category labels, and how did that affect your preci
 How did you prune the category tree, and how did that affect your precision?
 - Using a higher level category increased precision by 16%
 
+---
+
 ### For deriving synonyms from content:
 What 20 tokens did you use for evaluation?
 - Phone,Camera,Laptop,Refrigerator,Guitar,Dryer,Tv,Subwoofer,Beats,Mouse,Blender,Macbook,Apple,Samsung,Nintendo,Sony,Playstation,Xbox,Hp,Whirpool,Kitchenaid
 
 What fastText parameters did you use?
-- 
+- I didn't experiment much here outside of the defaults
 
 How did you transform the product names?
 - Lowercase, stemmed, removed punctuation, removed stop words
 
 What threshold score did you use?
-- .93
+- `.93`
 
 What synonyms did you obtain for those tokens?
 - See output above
 
+---
 
 ### For integrating synonyms with search:
 How did you transform the product names (if different than previously)?
 
 What threshold score did you use?
+- Used the same .93 threshold to limit words put into the index
 
 Were you able to find the additional results by matching synonyms?
+- Yes! I see big jumps in the recall of documents using the synomn search. 
