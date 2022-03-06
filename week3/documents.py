@@ -5,8 +5,6 @@
 from flask import (
     Blueprint, request, abort, current_app, jsonify
 )
-import fasttext
-import json
 
 bp = Blueprint('documents', __name__, url_prefix='/documents')
 
@@ -25,6 +23,8 @@ def annotate():
             if the_text is not None and the_text.find("%{") == -1:
                 if item == "name":
                     if syns_model is not None:
-                        print("IMPLEMENT ME: call nearest_neighbors on your syn model and return it as `name_synonyms`")
+                        syns = syns_model.get_nearest_neighbors(the_text)
+                        filtered_syns = filter(lambda x: x[0] > .93, syns)
+                        response['name_synonyms'] = list(filtered_syns)
         return jsonify(response)
     abort(415)
