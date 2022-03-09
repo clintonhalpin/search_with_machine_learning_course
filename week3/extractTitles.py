@@ -3,6 +3,7 @@ import random
 import xml.etree.ElementTree as ET
 import argparse
 from pathlib import Path
+import utilities.functions as fn
 
 directory = r'/workspace/search_with_machine_learning_course/data/pruned_products'
 parser = argparse.ArgumentParser(description='Process some integers.')
@@ -26,10 +27,11 @@ if args.input:
 sample_rate = args.sample_rate
 
 def transform_training_data(name):
-    # IMPLEMENT
-    return name.replace('\n', ' ')
+    return fn.extract_title_transform(name)
 
 # Directory for product data
+
+unique_words = {}
 
 print("Writing results to %s" % output_file)
 with open(output_file, 'w') as output:
@@ -43,4 +45,14 @@ with open(output_file, 'w') as output:
                     continue
                 if (child.find('name') is not None and child.find('name').text is not None):
                     name = transform_training_data(child.find('name').text)
+                    words = name.split(" ");
+                    for w in words:
+                        if w in unique_words:
+                            unique_words[w] += 1
+                        else:
+                            unique_words[w] = 1
                     output.write(name + "\n")
+
+unique_words = sorted(unique_words.items(), key=lambda item: item[1], reverse=True)  
+for item in unique_words[0:100]:
+    print(item[0], item[1])

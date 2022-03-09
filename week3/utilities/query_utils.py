@@ -1,4 +1,5 @@
 import math
+import week3.utilities.functions as fn
 # some helpful tools for dealing with queries
 def create_stats_query(aggs, extended=True):
     print("Creating stats query from %s" % aggs)
@@ -81,8 +82,17 @@ def create_simple_baseline(user_query, click_prior_query, filters, sort="_score"
                             "slop": "6",
                             "minimum_should_match": "2<75%",
                             "fields": ["name^10", "name.hyphens^10", "shortDescription^5",
-                                       "longDescription^5", "department^0.5", "sku", "manufacturer", "features", "categoryPath", "name_analogies"]
+                                       "longDescription^5", "department^0.5", "sku", "manufacturer", "features", "categoryPath"]
                        }
+                    },
+                    {
+                        "multi_match": {
+                            "query": fn.extract_title_transform(user_query),
+                            "type": "phrase",
+                            "slop": "6",
+                            "minimum_should_match": "2<75%",
+                            "fields": ["name_synonyms"]
+                        }
                     },
                     {
                       "terms":{ # Lots of SKUs in the query logs, boost by it, split on whitespace so we get a list
@@ -177,7 +187,7 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
                                     "slop": "6",
                                     "minimum_should_match": "2<75%",
                                     "fields": ["name^10", "name.hyphens^10", "shortDescription^5",
-                                       "longDescription^5", "department^0.5", "sku", "manufacturer", "features", "categoryPath", "name_analogies"]
+                                       "longDescription^5", "department^0.5", "sku", "manufacturer", "features", "categoryPath"]
                                }
                             },
                             {
