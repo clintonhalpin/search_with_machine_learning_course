@@ -82,6 +82,7 @@ def roll_up_category(cat):
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
 print('> checking for min_queries');
+print("> original unique categories={0}".format(df['category'].value_counts().size))
 df['category'] = df['category'].apply(roll_up_category)
 
 # Create labels in fastText format.
@@ -91,3 +92,6 @@ df['label'] = '__label__' + df['category']
 df = df[df['category'].isin(categories)]
 df['output'] = df['label'] + ' ' + df['clean_query']
 df[['output']].to_csv(output_file_name, header=False, sep='|', escapechar='\\', quoting=csv.QUOTE_NONE, index=False)
+
+
+print("> final categories={0}".format(df['category'].value_counts().size))
