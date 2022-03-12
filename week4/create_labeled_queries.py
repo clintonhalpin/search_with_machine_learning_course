@@ -79,6 +79,7 @@ def roll_up_category(cat):
         parent_cat = get_parent_category(parents_df, cat);
         return parent_cat
     return cat
+    
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
 print('> checking for min_queries');
