@@ -17,8 +17,8 @@ output_file_name = r'/workspace/datasets/labeled_query_data.txt'
 
 parser = argparse.ArgumentParser(description='Process arguments.')
 general = parser.add_argument_group("general")
-general.add_argument("--sample_size", default=1000000,  help="The number of queries to parse (default 1M)")
 general.add_argument("--min_queries", default=1,  help="The minimum number of queries per category label (default is 1)")
+general.add_argument("--sample_size", default=1000000,  help="Queries to sample from")
 general.add_argument("--output", default=output_file_name, help="the file to output to")
 
 args = parser.parse_args()
@@ -51,62 +51,43 @@ parents_df = pd.DataFrame(list(zip(categories, parents)), columns =['category', 
 
 # Read the training data into pandas, only keeping queries with non-root categories in our category tree.
 df = pd.read_csv(queries_file_name)[['category', 'query']]
+df = df.sample(n=sample_size)
 df = df[df['category'].isin(categories)]
+
+# IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
+print('> cleaning_queries')
+df['clean_query'] = df['query'].apply(fn.clean_query)
 
 #
 # Get Size of Category
 #
-def get_category_size(frame, category):
-    return frame[frame['category'] == category].size;
-
+cat_value_counts = df['category'].value_counts()
+def get_category_size(category):
+    return cat_value_counts[category]
 # 
 # Given a frame and category fetch the parent
 # 
 def get_parent_category(frame, category):
     return frame[frame['category'] == category]['parent'].item();    
 
-# IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
-# IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
-print("processing queries len={0}".format(df.size))
-
-
-
-
-clean_queries = [];
-for index, row in df.sample(n=sample_size).iterrows():
-    print(index)
-    query = row["query"]
-    #
-    # Clean the queries using shared function
-    #
-    normalized_query = fn.clean_query(query)
-    # print('query="{0}" clean="{1}"'.format(query, normalized_query))
-    #
-    # Create new rows for cleaned queries
-    #
-    new_row = {};
-    new_row["query"] = normalized_query;
-    new_row["category"] = row["category"]
-
-    category_size = get_category_size(df, row['category'])
-
-    if category_size < min_queries:
-        new_row["category"] = get_parent_category(parents_df, row['category'])
-
-    clean_queries.append(new_row)
-
-print('done_cleaning')
 # 
-# Create cleaned queries df and reassign df we are ready to write data
+# Check for min queries and roll up
 #
-cleaned_queries_df = pd.DataFrame(clean_queries)
-cleaned_queries_df.head();
-df = cleaned_queries_df;
+def roll_up_category(cat):
+    cat_size = get_category_size(cat);
+    if cat_size < min_queries:
+        parent_cat = get_parent_category(parents_df, cat);
+        return parent_cat
+    return cat
+
+# IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
+print('> checking for min_queries');
+df['category'] = df['category'].apply(roll_up_category)
 
 # Create labels in fastText format.
 df['label'] = '__label__' + df['category']
 
 # Output labeled query data as a space-separated file, making sure that every category is in the taxonomy.
 df = df[df['category'].isin(categories)]
-df['output'] = df['label'] + ' ' + df['query']
+df['output'] = df['label'] + ' ' + df['clean_query']
 df[['output']].to_csv(output_file_name, header=False, sep='|', escapechar='\\', quoting=csv.QUOTE_NONE, index=False)
