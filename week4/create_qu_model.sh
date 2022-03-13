@@ -8,8 +8,8 @@ MODEL="/workspace/datasets/qu_model/model_qu.bin"
 mkdir -p $MODEL_PATH
 rm -rf $MODEL
 
-head -n 10000 $DATA > $TRAINING | shuf
-tail -10000 $DATA > $TEST | shuf
+shuf -n 10000 $DATA > $TRAINING
+shuf -n 10000 $DATA > $TEST
 
 echo "Training data"
 head -n 10 $TRAINING
