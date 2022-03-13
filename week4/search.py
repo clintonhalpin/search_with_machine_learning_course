@@ -145,7 +145,7 @@ def query():
 
     query_class_model = current_app.config["query_model"]
     query_category = get_query_category(user_query, query_class_model)
-    # print('query_category', query_category, sort)
+    print('query_category', query_category)
     if query_category is not None:
         # print("IMPLEMENT ME: add this into the filters object so that it gets applied at search time.  This should look like your `term` filter from week 1 for department but for categories instead")
         for category in query_category:

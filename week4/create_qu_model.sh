@@ -8,8 +8,8 @@ MODEL="/workspace/datasets/qu_model/model_qu.bin"
 mkdir -p $MODEL_PATH
 rm -rf $MODEL
 
-shuf -n 10000 $DATA > $TRAINING
-shuf -n 10000 $DATA > $TEST
+head -n 10000 $DATA > $TRAINING
+tail -10000 $DATA > $TEST
 
 echo "Training data"
 head -n 10 $TRAINING
@@ -17,7 +17,7 @@ echo "Test data"
 head -n 10 $TEST
 
 # Train model
-~/fastText-0.9.2/fasttext supervised -input $TRAINING -output model_qu -lr .5 -epoch 50 -wordNgrams 2 -minCount 5 -loss hs
+~/fastText-0.9.2/fasttext supervised -input $TRAINING -output model_qu -lr .5 -epoch 25 -wordNgrams 2 -minCountLabel 10 -loss hs
 mv model_qu.bin model_qu.vec $MODEL_PATH
 
 # Test Model
