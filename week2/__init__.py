@@ -3,10 +3,12 @@ import os
 from flask import Flask
 from flask import render_template
 import pandas as pd
+from flask_cors import CORS
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
+    CORS(app)
 
     if test_config is None:
         # load the instance config, if it exists, when not testing

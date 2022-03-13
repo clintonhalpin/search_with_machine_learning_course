@@ -75,6 +75,7 @@ def query():
     ltr_model_name = "ltr_model"
     explain = False
     if request.method == 'POST':  # a query has been submitted
+        print(request.form)
         user_query = request.form['query']
         if not user_query:
             user_query = "*"
@@ -136,6 +137,8 @@ def query():
     # Not sure I think chrome is crashing because of too many nodes
     query_obj['size'] = 100;
     response = opensearch.search(body=query_obj, index="bbuy_products", explain=explain)
+
+    return response
     # Postprocess results here if you so desire
 
     #print(response)
